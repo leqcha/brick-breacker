@@ -64,10 +64,20 @@ function draw() {
         dx = -dx;
         ballColor = 'red';
     }
-    if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+    if( y + dy < ballRadius) {
         dy = -dy;
         ballColor = 'green';
+
+    } else if(y + dy > canvas.height - ballRadius){
+        if (x > paddleX && x < paddleX + paddleWidth){
+            dy = -dy;
+        } 
+        else{
+        alert("GAME OVER");
+        document.location.reload();
+        clearInterval(interval); 
     }
+}
     
     if(rightPressed && paddleX < canvas.width-paddleWidth) {
         paddleX += 7;
@@ -81,7 +91,7 @@ function draw() {
 }
 
 // On dessine infiniement toutes les 10ms
-setInterval(draw, 10);
+var interval = setInterval(draw, 10);
 
 
 
