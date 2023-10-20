@@ -1,10 +1,22 @@
-*{
+* {
     margin: 0;
     padding: 0;
 }
 
-canvas{
+h1 {
+    color: white;
+    text-align: center;
+    padding-top: 50px;
+    margin-bottom: 20px;
+}
+
+canvas {
     background: #000;
     display: block;
     margin: 0 auto;
+    border: 1px solid white;
+}
+
+body {
+    background-color: #000;
 }

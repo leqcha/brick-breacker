@@ -16,7 +16,14 @@ let paddleX = (canvas.width - paddleWidth) / 2;
 // Comportement de la raquette
 let rightPressed = false; // au début la valeur est fausse, aucune touche n'est pressée
 let leftPressed = false; // il faudra ajouter 2 écouteur pour savoir quand on appuie
-
+//  Création des briques
+var brickRowCount = 3;
+var brickColumnCount = 5;
+var brickWidth = 75;
+var brickHeight = 20;
+var brickPadding = 10;
+var brickOffsetTop = 30;
+var brickOffsetLeft = 30;
 // Ecouteurs sur les touches
 document.addEventListener("keydown", keyDownHandler, false); // Quand keydown est déclenché, la fonction keyDownHandler est exécutée
 document.addEventListener("keyup", keyUpHandler, false);
@@ -71,6 +78,7 @@ function draw() {
     } else if(y + dy > canvas.height - ballRadius){
         if (x > paddleX && x < paddleX + paddleWidth){
             dy = -dy;
+            dx *= 1.1; // ajouter de la vitesse quand la balle touche la raquette
         } 
         else{
         alert("GAME OVER");
