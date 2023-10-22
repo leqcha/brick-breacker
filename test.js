@@ -29,6 +29,13 @@ let brickOffsetLeft = (canvas.width - (brickColumnCount * (brickWidth + brickPad
 let brickX;
 let brickY;
 let b;
+
+// mouvement souris
+let relativeX;
+
+let score = 0;
+let lives = 3;
+
 // On place les briques dans un tableau en 2D (columns & rows)
 let bricks = [];
 for(let c = 0; c < brickColumnCount; c++) {
@@ -41,8 +48,18 @@ for(let c = 0; c < brickColumnCount; c++) {
 // Ecouteurs sur les touches
 document.addEventListener("keydown", keyDownHandler, false); // Quand keydown est déclenché, la fonction keyDownHandler est exécutée
 document.addEventListener("keyup", keyUpHandler, false);
+// Ecouteurs souris
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
-// Màj des variables selo, l'évènement e grâce à la propriété key
+//  lier le mvt de la raquette à la souris
+function mouseMoveHandler(e){
+    relativeX = e.clientX - canvas.offsetLeft; // Distance entre le bord gauche du canevas et pointeur souris
+    if (relativeX > paddleWidth / 2 && relativeX < canvas.width - paddleWidth / 2){
+        paddleX = relativeX - paddleWidth / 2;
+    }
+}
+
+// Màj des variables selon l'évènement e grâce à la propriété key
 function keyDownHandler(e) {
     if (e.keyCode == 39) {
         rightPressed = true;
@@ -68,10 +85,28 @@ function collisionDetection() {
                 if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
                     dy = -dy;
                     b.status = 0;
+                    score++;
+                    if (score == brickRowCount * brickColumnCount) {
+                        alert("Tu as cassé la baraque");
+                        document.location.reload();
+                        clearInterval(interval);
+                    } 
                 }
             }
         }
     }
+}
+
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Score: " + score, 8, 20);
+}
+
+function drawLives() {
+    ctx.font = "18px Arial";
+    ctx.fillStyle = "red";
+    ctx.fillText("Vies: " + lives, canvas.width - 65, 20);
 }
 
 function drawBall() {
@@ -115,29 +150,36 @@ function draw() {
     drawBall();
     drawBricks();
     drawPaddle();
+    drawScore();
+    drawLives();
     collisionDetection();
 
-    
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
         dx = -dx;
-        ballColor = 'red';
     }
     if( y + dy < ballRadius) {
         dy = -dy;
-        ballColor = 'green';
 
-    } else if(y + dy > canvas.height - ballRadius){
-        if (x > paddleX && x < paddleX + paddleWidth){
+    } else if (y + dy > canvas.height - ballRadius) {
+        if (x > paddleX && x < paddleX + paddleWidth) {
             dy = -dy;
             dx *= 1.1; // ajouter de la vitesse quand la balle touche la raquette
-        } 
-        else{
-        alert("GAME OVER");
-        document.location.reload();
-        clearInterval(interval); 
+        }
+        else {
+            lives--;
+            if (!lives) {
+                alert("GAME OVER");
+                document.location.reload();
+            }
+            else {
+                x = canvas.width / 2;
+                y = canvas.height - 30;
+                dx = 2;
+                dy = -2;
+                paddleX = (canvas.width - paddleWidth) / 2;
+            }
+        }
     }
-}
-    
     if(rightPressed && paddleX < canvas.width-paddleWidth) {
         paddleX += 7;
     }
@@ -147,10 +189,11 @@ function draw() {
     
     x += dx;
     y += dy;
+    requestAnimationFrame(draw);
 }
 
 // On dessine infiniement toutes les 10ms
-var interval = setInterval(draw, 10);
+draw();
 
 
 
