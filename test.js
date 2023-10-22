@@ -17,13 +17,25 @@ let paddleX = (canvas.width - paddleWidth) / 2;
 let rightPressed = false; // au début la valeur est fausse, aucune touche n'est pressée
 let leftPressed = false; // il faudra ajouter 2 écouteur pour savoir quand on appuie
 //  Création des briques
-var brickRowCount = 3;
-var brickColumnCount = 5;
-var brickWidth = 75;
-var brickHeight = 20;
-var brickPadding = 10;
-var brickOffsetTop = 30;
-var brickOffsetLeft = 30;
+let brickRowCount = 3;
+let brickColumnCount = 5;
+let brickWidth = 75;
+let brickHeight = 20;
+let brickPadding = 10;
+let brickOffsetTop = 30;
+let brickOffsetLeft = (canvas.width - (brickColumnCount * (brickWidth + brickPadding))) / 2;
+let brickX;
+let brickY;
+
+// On place les briques dans un tableau en 2D (columns & rows)
+let bricks = [];
+for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0};
+    }
+}
+
 // Ecouteurs sur les touches
 document.addEventListener("keydown", keyDownHandler, false); // Quand keydown est déclenché, la fonction keyDownHandler est exécutée
 document.addEventListener("keyup", keyUpHandler, false);
@@ -62,9 +74,27 @@ function drawPaddle() {
     ctx.closePath();
 }
 
+// Briques
+function drawBricks() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+            brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBall();
+    drawBricks();
     drawPaddle();
     
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
