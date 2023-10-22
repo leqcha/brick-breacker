@@ -16,6 +16,7 @@ let paddleX = (canvas.width - paddleWidth) / 2;
 // Comportement de la raquette
 let rightPressed = false; // au début la valeur est fausse, aucune touche n'est pressée
 let leftPressed = false; // il faudra ajouter 2 écouteur pour savoir quand on appuie
+
 //  Création des briques
 let brickRowCount = 3;
 let brickColumnCount = 5;
@@ -23,17 +24,18 @@ let brickWidth = 75;
 let brickHeight = 20;
 let brickPadding = 10;
 let brickOffsetTop = 30;
+// On calcule où commencer la position pour centrer
 let brickOffsetLeft = (canvas.width - (brickColumnCount * (brickWidth + brickPadding))) / 2;
 let brickX;
 let brickY;
-
+let b;
 // On place les briques dans un tableau en 2D (columns & rows)
 let bricks = [];
-for (let c = 0; c < brickColumnCount; c++) {
-    bricks[c] = [];
-    for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0};
-    }
+for(let c = 0; c < brickColumnCount; c++) {
+  bricks[c] = [];
+  for(let r = 0; r<brickRowCount; r++) {
+    bricks[c][r] = { x: 0, y: 0, status: 1 };
+  }
 }
 
 // Ecouteurs sur les touches
@@ -54,6 +56,21 @@ function keyUpHandler(e) {
         rightPressed = false;
     } else if (e.keyCode == 37){
         leftPressed = false;
+    }
+}
+
+function collisionDetection() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            b = bricks[c][r];
+            // calculs de positions
+            if (b.status == 1){
+                if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                    dy = -dy;
+                    b.status = 0;
+                }
+            }
+        }
     }
 }
 
@@ -78,15 +95,17 @@ function drawPaddle() {
 function drawBricks() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
-            brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-            brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-            bricks[c][r].x = brickX;
-            bricks[c][r].y = brickY;
-            ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillStyle = "white";
-            ctx.fill();
-            ctx.closePath();
+            if (bricks[c][r].status == 1) {
+                brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "white";
+                ctx.fill();
+                ctx.closePath();
+            }
         }
     }
 }
@@ -96,6 +115,8 @@ function draw() {
     drawBall();
     drawBricks();
     drawPaddle();
+    collisionDetection();
+
     
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
         dx = -dx;
